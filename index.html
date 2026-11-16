@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Absensi Wajah</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--p:#0b84c6;--pl:#dff1fb;--g:#12b312;--bg:#f5f7fa;--t:#1f2933;--m:#7b8794;--r:#e5484d}
+*{box-sizing:border-box}body{margin:0;font-family:Nunito,system-ui,sans-serif;background:var(--bg);color:var(--t)}
+header{background:#fff;text-align:center;padding:20px 12px 8px}header h1{margin:0;font-size:24px;font-weight:800}header small{color:var(--m);font-weight:600}
+nav{display:flex;background:#fff;box-shadow:0 1px 4px #0001;position:sticky;top:0;z-index:5}
+nav button{flex:1;border:0;background:0;padding:16px 6px;font:700 15px Nunito;cursor:pointer;color:var(--t)}
+nav button.on{background:var(--pl);color:var(--p);box-shadow:inset 0 2px var(--p)}
+main{max-width:1000px;margin:24px auto;padding:0 14px}.hide{display:none!important}
+.card{background:#fff;border-radius:14px;box-shadow:0 1px 6px #0001;padding:20px;margin-bottom:16px}
+input{font:600 15px Nunito;padding:11px 14px;border:1px solid #d9e0e7;border-radius:10px;outline:0;width:100%}input:focus{border-color:var(--p)}
+.btn{font:700 15px Nunito;border:0;border-radius:10px;padding:11px 20px;cursor:pointer;background:var(--g);color:#fff}
+.btn.o{background:#fff;color:var(--t);box-shadow:0 1px 4px #0002}.btn.b{background:var(--p)}.btn.r{background:var(--r)}.btn:disabled{opacity:.5}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}.row>input{flex:1;min-width:140px}
+.cam{position:relative;max-width:560px;margin:0 auto;border-radius:16px;overflow:hidden;background:#111;aspect-ratio:4/3}
+.cam video{width:100%;height:100%;object-fit:cover;transform:scaleX(-1)}
+.cam:after{content:"";position:absolute;inset:12% 25%;border:3px dashed #fff8;border-radius:50%}
+.clock{text-align:center;margin-bottom:14px}.clock b{font-size:40px;font-weight:800;display:block}.clock span{color:var(--m);font-weight:600}
+.res{max-width:560px;margin:14px auto 0;padding:16px;border-radius:14px;text-align:center;font-weight:700;background:#eef2f6;color:var(--m)}
+.res.datang{background:#e3f8e3;color:#0c8a0c}.res.pulang{background:var(--pl);color:var(--p)}.res.sudah{background:#fff4d6;color:#a36a00}
+.res b{display:block;font-size:20px;color:var(--t)}
+table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:12px 10px;font-size:14px}th{font-weight:800;border-bottom:1px solid #eef2f6}tr:nth-child(even) td{background:#fafbfc}
+.tw{overflow-x:auto}.tag{font-size:12px;padding:3px 10px;border-radius:6px;background:var(--pl);color:var(--p);font-weight:700}.tag.x{background:#fde8e8;color:var(--r)}
+h2{margin:0 0 14px;font-size:18px}.login{max-width:360px;margin:40px auto}.login input{margin:10px 0}
+.msg{color:var(--r);font-weight:600;font-size:14px;min-height:18px;margin-top:8px}
+</style></head><body>
+<header><h1 id="inst">Absensi Wajah</h1><small>Sistem Absensi Pengenalan Wajah</small></header>
+<nav id="nav"><button data-v="scan" class="on">Scan Wajah</button><button data-v="students">Siswa</button><button data-v="report">Rekap</button><button data-v="settings">Pengaturan</button></nav>
+<main>
+<!-- SCAN -->
+<section id="v-scan">
+  <div class="card"><div class="clock"><b id="clk">--:--:--</b><span id="dt"></span></div>
+  <div class="cam"><video id="vid" autoplay muted playsinline></video></div>
+  <div class="res" id="res">Memuat kamera &amp; model wajah…</div></div>
+</section>
+<!-- LOGIN -->
+<section id="v-login" class="hide"><div class="card login"><h2>Login Admin</h2>
+  <input id="us" placeholder="Username" value="admin"><input id="pw" type="password" placeholder="Password"><button class="btn b" style="width:100%" id="loginBtn">Masuk</button><div class="msg" id="lmsg"></div></div></section>
+<!-- SISWA -->
+<section id="v-students" class="hide">
+  <div class="card"><h2 id="fTitle">Tambah Siswa</h2>
+    <div class="row"><input id="sCode" placeholder="ID Siswa (mis. 2024001)"><input id="sName" placeholder="Nama lengkap"></div>
+    <div class="cam" style="margin:16px auto"><video id="vid2" autoplay muted playsinline></video></div>
+    <div class="row"><button class="btn b" id="capBtn">📸 Daftarkan Wajah</button><button class="btn" id="saveBtn">Simpan</button><button class="btn o" id="cancelBtn">Batal</button><span id="capSt" style="font-weight:600;color:var(--m)"></span></div></div>
+  <div class="card"><h2>Daftar Siswa</h2><div class="tw"><table><thead><tr><th>ID</th><th>Nama</th><th>Wajah</th><th></th></tr></thead><tbody id="sBody"></tbody></table></div></div>
+</section>
+<!-- REKAP -->
+<section id="v-report" class="hide">
+  <div class="card"><div class="row"><label>Dari</label><input type="date" id="from" style="max-width:170px"><label>Sampai</label><input type="date" id="to" style="max-width:170px">
+    <button class="btn b" id="showBtn">Tampilkan</button><button class="btn o" id="xlsBtn">Export Excel</button><button class="btn o" id="pdfBtn">Export PDF</button></div></div>
+  <div class="card tw"><table><thead><tr><th>No</th><th>ID</th><th>Nama</th><th>Tanggal</th><th>Jam Datang</th><th>Jam Pulang</th></tr></thead><tbody id="rBody"></tbody></table></div>
+</section>
+<!-- PENGATURAN -->
+<section id="v-settings" class="hide"><div class="card"><h2>Nama Instansi</h2>
+  <div class="row"><input id="nameIn" placeholder="Nama sekolah / instansi"><button class="btn" id="nameBtn">Simpan</button></div>
+  <div style="margin-top:18px"><button class="btn o" id="outBtn">Logout</button></div></div></section>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/@vladmandic/face-api/dist/face-api.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+<script>
+const $=s=>document.querySelector(s), esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const api=async(a,d)=>{const r=await fetch('api.php?a='+a,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(d||{})});const j=await r.json();if(!r.ok)throw j;return j};
+const MODEL='https://cdn.jsdelivr.net/npm/@vladmandic/face-api/model/';
+let admin=false,view='scan',stream=null,matcher=null,ready=null,inst='Absensi Wajah',S=[],editId=null,newDesc=null,rows=[],last={};
+
+function loadModels(){return ready??=Promise.all([faceapi.nets.tinyFaceDetector.loadFromUri(MODEL),faceapi.nets.faceLandmark68Net.loadFromUri(MODEL),faceapi.nets.faceRecognitionNet.loadFromUri(MODEL)])}
+async function cam(v){stopCam();stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'user',width:640,height:480}});v.srcObject=stream}
+function stopCam(){stream&&stream.getTracks().forEach(t=>t.stop());stream=null}
+const detect=v=>faceapi.detectSingleFace(v,new faceapi.TinyFaceDetectorOptions({inputSize:320})).withFaceLandmarks().withFaceDescriptor();
+
+async function go(v){
+  view=v;stopCam();
+  document.querySelectorAll('#nav button').forEach(b=>b.classList.toggle('on',b.dataset.v===v));
+  ['scan','login','students','report','settings'].forEach(x=>$('#v-'+x).classList.add('hide'));
+  if(v!=='scan'&&!admin){$('#v-login').classList.remove('hide');return}
+  $('#v-'+v).classList.remove('hide');
+  if(v==='scan')startScan();
+  if(v==='students'){loadStudents();cam($('#vid2')).then(loadModels).catch(e=>$('#capSt').textContent='Kamera tidak bisa dibuka (butuh HTTPS & izin kamera)')}
+  if(v==='settings')$('#nameIn').value=inst;
+}
+async function startScan(){
+  const res=$('#res');
+  try{
+    await cam($('#vid'));await loadModels();
+    const f=await api('faces');
+    matcher=f.length?new faceapi.FaceMatcher(f.map(x=>new faceapi.LabeledFaceDescriptors(String(x.id),JSON.parse(x.descriptor).map(d=>new Float32Array(d)))),0.5):null;
+    res.className='res';res.textContent=matcher?'Silakan hadapkan wajah ke kamera':'Belum ada wajah terdaftar';
+    loop();
+  }catch(e){res.textContent='Kamera tidak bisa dibuka. Gunakan HTTPS dan izinkan akses kamera.'}
+}
+async function loop(){
+  if(view!=='scan'||!stream)return;
+  try{
+    const d=await detect($('#vid'));
+    if(d&&matcher){
+      const m=matcher.findBestMatch(d.descriptor);
+      if(m.label!=='unknown'&&Date.now()-(last[m.label]||0)>6000){
+        last[m.label]=Date.now();
+        const r=await api('scan',{id:+m.label});
+        const L={datang:'✅ Absen datang',pulang:'👋 Absen pulang',sudah:'ℹ️ Sudah absen datang'};
+        $('#res').className='res '+r.type;$('#res').innerHTML=`${L[r.type]}<b>${esc(r.name)}</b>${esc(r.code)} · ${r.time}`;
+      }else if(m.label==='unknown'){$('#res').className='res';$('#res').textContent='Wajah tidak dikenali'}
+    }
+  }catch(e){}
+  setTimeout(loop,600);
+}
+setInterval(()=>{const n=new Date();$('#clk').textContent=n.toLocaleTimeString('id-ID',{hour12:false});$('#dt').textContent=n.toLocaleDateString('id-ID',{weekday:'long',day:'numeric',month:'long',year:'numeric'})},1000);
+
+// Login
+$('#loginBtn').onclick=async()=>{try{await api('login',{username:$('#us').value,password:$('#pw').value});admin=true;$('#pw').value='';$('#lmsg').textContent='';go(view)}catch(e){$('#lmsg').textContent=e.error||'Gagal'}};
+$('#pw').onkeydown=e=>e.key==='Enter'&&$('#loginBtn').click();
+$('#outBtn').onclick=async()=>{await api('logout');admin=false;go('scan')};
+
+// Siswa
+async function loadStudents(){S=await api('students');$('#sBody').innerHTML=S.map(s=>`<tr><td>${esc(s.code)}</td><td><b>${esc(s.name)}</b></td><td><span class="tag ${+s.has_face?'':'x'}">${+s.has_face?'Terdaftar':'Belum'}</span></td><td style="text-align:right"><button class="btn o" onclick="edit(${s.id})">Edit</button> <button class="btn r" onclick="del(${s.id})">Hapus</button></td></tr>`).join('')||'<tr><td colspan=4>Belum ada siswa</td></tr>'}
+function reset(){editId=null;newDesc=null;$('#sCode').value=$('#sName').value='';$('#capSt').textContent='';$('#fTitle').textContent='Tambah Siswa'}
+window.edit=id=>{const s=S.find(x=>x.id==id);editId=id;newDesc=null;$('#sCode').value=s.code;$('#sName').value=s.name;$('#fTitle').textContent='Edit Siswa';scrollTo(0,0)};
+window.del=async id=>{if(confirm('Hapus siswa beserta data absensinya?')){await api('student_delete',{id});loadStudents()}};
+$('#cancelBtn').onclick=reset;
+$('#capBtn').onclick=async()=>{
+  const b=$('#capBtn'),st=$('#capSt'),ds=[];b.disabled=true;
+  try{await loadModels();
+    for(let i=0;i<8&&ds.length<3;i++){st.textContent=`Mengambil sampel ${ds.length+1}/3… ubah sedikit posisi wajah`;const d=await detect($('#vid2'));if(d)ds.push(Array.from(d.descriptor));await new Promise(r=>setTimeout(r,700))}
+    if(ds.length<3)st.textContent='❌ Wajah tidak terdeteksi, coba lagi';else{newDesc=JSON.stringify(ds);st.textContent='✅ Wajah tertangkap, klik Simpan'}
+  }catch(e){st.textContent='❌ Gagal, cek kamera'}
+  b.disabled=false;
+};
+$('#saveBtn').onclick=async()=>{
+  try{await api('student_save',{id:editId,code:$('#sCode').value,name:$('#sName').value,descriptor:newDesc});reset();loadStudents()}catch(e){alert(e.error||'Gagal menyimpan')}
+};
+
+// Rekap
+const iso=d=>d.toISOString().slice(0,10),now=new Date();
+$('#from').value=iso(now).slice(0,8)+'01';$('#to').value=iso(now);
+$('#showBtn').onclick=async()=>{
+  rows=await api('report',{from:$('#from').value,to:$('#to').value});
+  $('#rBody').innerHTML=rows.map((r,i)=>`<tr><td>${i+1}</td><td>${esc(r.code)}</td><td><b>${esc(r.name)}</b></td><td>${r.date}</td><td>${r.time_in||'-'}</td><td>${r.time_out||'-'}</td></tr>`).join('')||'<tr><td colspan=6>Tidak ada data</td></tr>';
+};
+const tbl=()=>rows.map((r,i)=>[i+1,r.code,r.name,r.date,r.time_in||'-',r.time_out||'-']);
+const H=['No','ID','Nama','Tanggal','Jam Datang','Jam Pulang'];
+$('#xlsBtn').onclick=()=>{if(!rows.length)return alert('Tampilkan data dulu');const ws=XLSX.utils.aoa_to_sheet([[inst],[`Rekap Kehadiran ${$('#from').value} s/d ${$('#to').value}`],[],H,...tbl()]);ws['!cols']=[{wch:5},{wch:14},{wch:28},{wch:12},{wch:12},{wch:12}];const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'Rekap');XLSX.writeFile(wb,`rekap-${$('#from').value}_${$('#to').value}.xlsx`)};
+$('#pdfBtn').onclick=()=>{if(!rows.length)return alert('Tampilkan data dulu');const d=new jspdf.jsPDF();d.setFontSize(16);d.text(inst,14,16);d.setFontSize(10);d.text(`Rekap Kehadiran: ${$('#from').value} s/d ${$('#to').value}`,14,23);d.autoTable({head:[H],body:tbl(),startY:28,headStyles:{fillColor:[11,132,198]}});d.save(`rekap-${$('#from').value}_${$('#to').value}.pdf`)};
+
+// Pengaturan
+$('#nameBtn').onclick=async()=>{await api('settings_save',{name:$('#nameIn').value});setName($('#nameIn').value);alert('Tersimpan')};
+function setName(n){inst=n||inst;$('#inst').textContent=inst;document.title=inst}
+document.querySelectorAll('#nav button').forEach(b=>b.onclick=()=>go(b.dataset.v));
+(async()=>{try{setName((await api('settings')).name);const me=await api('me');admin=me.admin;if(!me.login)$('#outBtn').classList.add('hide')}catch(e){$('#res').textContent='Database belum terhubung, cek config.php'}go('scan')})();
+</script></body></html>

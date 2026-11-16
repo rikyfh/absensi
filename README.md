@@ -27,3 +27,7 @@ Aplikasi absensi siswa berbasis pengenalan wajah (PHP + MySQL + face-api.js).
 - Yang disimpan hanya vektor wajah (angka), bukan foto. Tetap data pribadi:
   minta persetujuan siswa/orang tua.
 - Zona waktu: Asia/Jakarta (ubah di `api.php`).
+
+## Login
+Bawaan: **tanpa login** (`login_required` = false di config) agar guru langsung bisa buka Siswa & Rekap.
+Untuk mengaktifkan login, set `'login_required' => true` di `config.local.php`.
