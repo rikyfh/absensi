@@ -6,5 +6,5 @@ return [
   'user' => 'user_database',
   'pass' => 'password_database',
   'admin_user' => 'admin',
-  'admin_pass' => '212123',
+  'admin_pass' => '',
 ];
